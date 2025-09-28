@@ -491,28 +491,35 @@ func (config *DiskStorageConfig) toVz() (vz.StorageDeviceAttachment, error) {
 		return nil, fmt.Errorf("missing mandatory 'path' option for %s device", config.DevName)
 	}
 
-	info, err := os.Lstat(config.ImagePath)
+	var stat unix.Stat_t
+	err := unix.Lstat(config.ImagePath, &stat)
+
 	if err != nil {
 		return nil, fmt.Errorf("error stating file: %v", err)
 	}
-	stat, ok := info.Sys().(*syscall.Stat_t)
-	if !ok {
-		return nil, fmt.Errorf("unable to get raw syscall.Stat_t data")
-	}
+
 	mode := stat.Mode
-	if mode & syscall.S_IFMT == syscall.S_IFBLK {
+	if mode&unix.S_IFMT == unix.S_IFBLK {
 		var mode int
 		if config.ReadOnly {
 			mode = os.O_RDONLY
 		} else {
 			mode = os.O_RDWR
 		}
+
 		f, err := os.OpenFile(config.ImagePath, mode, 0)
 		if err != nil {
 			return nil, fmt.Errorf("error opening file: %v", err)
 		}
+
 		syncMode := vz.DiskSynchronizationModeFull
-		return vz.NewDiskBlockDeviceStorageDeviceAttachment(f, config.ReadOnly, syncMode)
+		attachment, err := vz.NewDiskBlockDeviceStorageDeviceAttachment(f, config.ReadOnly, syncMode)
+		if err != nil {
+			_ = f.Close()
+			return nil, fmt.Errorf("error creating disk attachment: %v", err)
+		}
+
+		return attachment, nil
 	}
 
 	syncMode := vz.DiskImageSynchronizationModeFsync
