@@ -289,7 +289,7 @@ var jsonStabilityTests = map[string]jsonStabilityTest{
 		},
 
 		skipFields:   []string{"DevName", "URI"},
-		expectedJSON: `{"kind":"virtioblk","devName":"virtio-blk","imagePath":"ImagePath","readOnly":true,"deviceIdentifier":"DeviceIdentifier"}`,
+		expectedJSON: `{"kind":"virtioblk","devName":"virtio-blk","imagePath":"ImagePath","readOnly":true,"type":"Type","deviceIdentifier":"DeviceIdentifier"}`,
 	},
 	"USBMassStorage": {
 		newObjectFunc: func(t *testing.T) any {
@@ -298,7 +298,7 @@ var jsonStabilityTests = map[string]jsonStabilityTest{
 			return usb
 		},
 		skipFields:   []string{"DevName", "URI"},
-		expectedJSON: `{"kind":"usbmassstorage","devName":"usb-mass-storage","imagePath":"ImagePath","readOnly":true}`,
+		expectedJSON: `{"kind":"usbmassstorage","devName":"usb-mass-storage","imagePath":"ImagePath","readOnly":true,"type":"Type"}`,
 	},
 	"NVMExpressController": {
 		newObjectFunc: func(t *testing.T) any {
@@ -307,7 +307,7 @@ var jsonStabilityTests = map[string]jsonStabilityTest{
 			return nvme
 		},
 		skipFields:   []string{"DevName", "URI"},
-		expectedJSON: `{"kind":"nvme","devName":"nvme","imagePath":"ImagePath","readOnly":true}`,
+		expectedJSON: `{"kind":"nvme","devName":"nvme","imagePath":"ImagePath","readOnly":true,"type":"Type"}`,
 	},
 	"LinuxBootloader": {
 		obj:          &LinuxBootloader{},
