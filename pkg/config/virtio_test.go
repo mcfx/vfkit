@@ -127,6 +127,27 @@ func TestVirtioDevices(t *testing.T) {
 			expectedCmdLine:  []string{"--device", fmt.Sprintf("virtio-blk,path=%s,type=dev", testImagePath)},
 			alternateCmdLine: []string{"--device", fmt.Sprintf("virtio-blk,type=dev,path=%s", testImagePath)},
 		},
+		"NewVirtioBlkWithDefaultType": {
+			newDev: func() (VirtioDevice, error) {
+				dev, err := getTestVirtioBlkDevice(testImagePath)
+				if err != nil {
+					return nil, err
+				}
+				dev.Type = DiskBackendDefault
+				return dev, nil
+			},
+			expectedDev: &VirtioBlk{
+				DiskStorageConfig: DiskStorageConfig{
+					StorageConfig: StorageConfig{
+						DevName: "virtio-blk",
+					},
+					ImagePath: testImagePath,
+					Type:      DiskBackendDefault,
+				},
+				DeviceIdentifier: "",
+			},
+			expectedCmdLine: []string{"--device", fmt.Sprintf("virtio-blk,path=%s", testImagePath)},
+		},
 		"NewNVMe": {
 			newDev: func() (VirtioDevice, error) { return NVMExpressControllerNew("/foo/bar") },
 			expectedDev: &NVMExpressController{
