@@ -495,6 +495,8 @@ func AddToVirtualMachineConfig(vmConfig *VirtualMachineConfiguration, dev config
 	}
 }
 
+var diskDeviceFiles []*os.File
+
 func (conf *DiskStorageConfig) toVz() (vz.StorageDeviceAttachment, error) {
 	switch conf.Type {
 	case config.DiskBackendImage, config.DiskBackendDefault:
@@ -535,6 +537,7 @@ func (conf *DiskStorageConfig) toVz() (vz.StorageDeviceAttachment, error) {
 			_ = f.Close()
 			return nil, fmt.Errorf("error creating disk attachment: %v", err)
 		}
+		diskDeviceFiles = append(diskDeviceFiles, f)
 
 		return attachment, nil
 	default:
